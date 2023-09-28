@@ -1,7 +1,7 @@
-
-
+BR=/home/builder/sdk2/sdk/buildroot-2023.08-rc3/
 # config
-CC      = /usr/bin/gcc
+#CC      = /usr/bin/gcc
+CC=$(BR)/output/host/bin/mipsel-linux-gcc
 LDFLAGS =  -lcrypto
 CFLAGS_DEBUG 	= -std=c99	-Wall -g -DDEBUG -D_REENTRANT
 CFLAGS_NORMAL 	= -std=c99 -O3 
@@ -11,10 +11,6 @@ OBJ = ipmi-msg.o ipmi-sdr.o ipmi-sensor.o ipmi-session.o udp-server.o asf.o rmcp
 %.o: %.c
 	$(CC) $(CFLAGS) -c $<
 
-
-
-
-	
 ipmi-server : $(OBJ)
 	$(CC) $(CFLAGS)   -o $@ $(OBJ) $(LDFLAGS)
 

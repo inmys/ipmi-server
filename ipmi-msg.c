@@ -55,6 +55,9 @@ protocol_data* ipmi_msg_process_packet(protocol_data* packet_inc, ipmi_session_a
 
 
 
+	printf("msg_in->net_fn: 0x%x\n", msg_in->net_fn);
+	printf("msg_in->cmd: 0x%x\n", msg_in->cmd);
+	printf("msg_in->data[0..1]: 0x%x\n\n", msg_in->data[0]);
 
 	switch(msg_in->net_fn) {
 	case IPMI_NETFN_APP:
@@ -117,6 +120,25 @@ protocol_data* ipmi_msg_process_packet(protocol_data* packet_inc, ipmi_session_a
 			msg_out->data[10] = 0x0; 	// byte 11 Product ID byte 1
 			msg_out->data[11] = 0x0; 	// byte 12 Product ID byte 2f
 
+			break;
+
+		// case IPMI_CMD_SET_POWER_STATE: 
+		// 	msg_out->data_len = 1;
+		// 	msg_out->data= calloc(msg_out->data_len,  sizeof(unsigned char));
+		// 	msg_out->data[0] = 0;		// completion code: Command Completed Normallys
+		// 	printf("WE ARE IN SET POWER STATE\n");
+		// 	switch (msg_in->data[0]){
+		// 		case 0x00:
+		// 			system("echo 0 > /sys/bus/platform/devices/leds/leds/d2/brightness");
+		// 			break;
+		// 		case 0x01:
+		// 			system("echo 1 > /sys/bus/platform/devices/leds/leds/d2/brightness");
+		// 			break;
+
+		// 	}
+			
+			
+			
 			break;
 		case IPMI_CMD_SET_SES_PRIV_LEVEL:
 			msg_out->data_len = 2;
@@ -300,7 +322,41 @@ protocol_data* ipmi_msg_process_packet(protocol_data* packet_inc, ipmi_session_a
 		}
 
 		break; // switch close: IPMI_NETFN_SENSOR
+	
+	case IPMI_NETFN_CHASSIS:
+		switch(msg_in->cmd) {
+		case IPMI_CMD_CHASSIS_POWER_STATUS:
+			printf("Get Power Data\n");
+			msg_out->data_len = 3;
+			msg_out->data= malloc(msg_out->data_len* sizeof(unsigned char));
+			msg_out->data[0] = 0x0;		// completion code: Command Completed Normally
+			msg_out->data[1] = 0xff;		//
+			msg_out->data[2] = 0x00;		// 
+			break;
 
+		case IPMI_CMD_CHASSIS_POWER_CONTROL:
+			printf("Set Power Status\n");
+			msg_out->data_len = 1;
+			msg_out->data= malloc(msg_out->data_len* sizeof(unsigned char));
+			//msg_in->data[0] &= ~(1<<7);
+			switch(msg_in->data[0]){
+				case IPMI_CHASSIS_CTL_POWER_DOWN:
+					system("echo 0 > /sys/bus/platform/devices/leds/leds/d2/brightness");
+					break;
+				case IPMI_CHASSIS_CTL_POWER_UP:
+					system("echo 1 > /sys/bus/platform/devices/leds/leds/d2/brightness");
+					break;
+				case IPMI_CHASSIS_CTL_POWER_CYCLE:
+				case IPMI_CHASSIS_CTL_HARD_RESET:
+					system("echo 0 > /sys/bus/platform/devices/leds/leds/d2/brightness");
+					system("sleep 2");
+					system("echo 1 > /sys/bus/platform/devices/leds/leds/d2/brightness");
+					break;
+			}
+			msg_out->data[0] = 0x0;		// completion code: Command Completed Normally
+			break;
+		}
+	break;
 
 	default:
 #ifdef DEBUG
@@ -310,6 +366,7 @@ protocol_data* ipmi_msg_process_packet(protocol_data* packet_inc, ipmi_session_a
 		msg_out->data= malloc(msg_out->data_len* sizeof(unsigned char));
 		msg_out->data[0] = 0xd5;	// completion code: Cannot execute command. Command, or request parameter(s), not supported in present state.
 		break;
+
 	}
 
 

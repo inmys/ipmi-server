@@ -23,6 +23,7 @@
 #define CMD_OFFSET_COMPL_CODE			0x00
 // cmds application
 #define IPMI_CMD_GET_DEVICE_ID			0x01	// get device ID
+#define IPMI_CMD_SET_POWER_STATE		0x06 //set acpi power state ###
 /*****************************************************************************/
 /* IPMI command: Get Channel Authentication Capabilities
 /*****************************************************************************/
@@ -59,9 +60,22 @@
 #define IPMI_CMD_GET_SENSOR_EVENT_STATUS	0x2b	// Get Sensor Event Status
 #define IPMI_CMD_GET_SENSOR_EVENT_ENABLE	0x29	// Get Sensor Event Enable
 
+//cmds chassis
+#define IPMI_CMD_CHASSIS_POWER_STATUS 0x01
+#define IPMI_CMD_CHASSIS_POWER_CONTROL 0x02
 
+//chassis power states
+#define IPMI_CHASSIS_CTL_POWER_DOWN	0x0
+#define IPMI_CHASSIS_CTL_POWER_UP	0x1
+#define IPMI_CHASSIS_CTL_POWER_CYCLE	0x2
+#define IPMI_CHASSIS_CTL_HARD_RESET	0x3
+#define IPMI_CHASSIS_CTL_PULSE_DIAG	0x4
+#define IPMI_CHASSIS_CTL_ACPI_SOFT	0x5
 
-
+#define IPMI_CHASSIS_POLICY_NO_CHANGE	0x3
+#define IPMI_CHASSIS_POLICY_ALWAYS_ON	0x2
+#define IPMI_CHASSIS_POLICY_PREVIOUS	0x1
+#define IPMI_CHASSIS_POLICY_ALWAYS_OFF	0x0
 
 // Network Function Codes
 #define IPMI_NETFN_CHASSIS				0x00
