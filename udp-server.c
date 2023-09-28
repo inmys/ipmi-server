@@ -30,6 +30,7 @@ void exit_cleanup() {
 	exit(0);
 }
 
+char *password_padded;
 int main(int argc, char**argv)
 {
 	// padd current password with zeros
